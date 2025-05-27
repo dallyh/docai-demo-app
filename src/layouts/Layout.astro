@@ -1,27 +1,37 @@
 ---
-import "../styles/tailwind.css"
+import "../styles/tailwind.css";
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="robots" content="noindex" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>DocAI Demo Application</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="robots" content="noindex" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>DocAI Demo Application</title>
+    </head>
+    <body>
+        <div class="max-w-xl mx-auto p-4 space-y-4 flex flex-col gap-4">
+            <slot />
+            <footer class="footer flex flex-row justify-center">
+                <div class="inline-flex">
+                    <a class="link" href="https://github.com/dallyh/docai-demo-app" target="_blank">Source code</a> | <a
+                        class="link"
+                        href="https://docs.abbyy.com/introduction"
+                        target="_blank">DocAI docs</a>
+                </div>
+            </footer>
+        </div>
+    </body>
 </html>
 
 <style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+    html,
+    body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+    }
 </style>

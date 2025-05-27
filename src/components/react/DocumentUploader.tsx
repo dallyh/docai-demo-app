@@ -77,7 +77,7 @@ export default function DocumentUploader() {
     };
 
     return (
-        <div className="max-w-xl mx-auto p-4 space-y-4 flex flex-col">
+        <div className="flex flex-col gap-4">
             <div className="form-control w-full">
                 <label className="label">
                     <span className="label-text">Select Model</span>
@@ -103,7 +103,7 @@ export default function DocumentUploader() {
 
             <textarea
                 className="textarea textarea-bordered w-full h-64 font-mono"
-                placeholder="Action output will appear here…"
+                placeholder="DocAI API output will appear here…"
                 value={result}
                 readOnly
             />
