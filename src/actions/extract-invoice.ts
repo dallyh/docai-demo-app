@@ -27,6 +27,14 @@ export const extractInvoice = defineAction({
             processed = response.invoice?.meta.status === "Processed";
         }
 
+        try {
+            await documentAi.documents.delete({
+                documentId: docId,
+            });
+        } catch {
+            console.log("Deleted document :" + docId);
+        }
+
         const extracted = response?.invoice?.fields ?? {};
         const plain = JSON.parse(JSON.stringify(extracted));
         return { fields: plain };

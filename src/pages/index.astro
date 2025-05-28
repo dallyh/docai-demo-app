@@ -1,8 +1,26 @@
 ---
-import DocumentUploader from '../components/react/DocumentUploader';
-import Layout from '../layouts/Layout.astro';
+import ConvertDocument from "../components/react/ConvertDocument";
+import Extractor from "../components/react/Extractor";
+import ImageToText from "../components/react/ImageToText"
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
-	<DocumentUploader client:load>
+    <div class="tabs tabs-box">
+        <input type="radio" name="my_tabs_6" class="tab" aria-label="Models" checked="checked" />
+        <div class="tab-content bg-base-100 border-base-300 p-6">
+			<Extractor client:visible />
+		</div>
+
+        <input type="radio" name="my_tabs_6" class="tab" aria-label="Image to text" />
+        <div class="tab-content bg-base-100 border-base-300 p-6">
+			<ImageToText client:visible />
+		</div>
+
+        <input type="radio" name="my_tabs_6" class="tab" aria-label="Convert document" />
+        <div class="tab-content bg-base-100 border-base-300 p-6">
+			<ConvertDocument client:visible />
+		</div>
+    </div>
+    
 </Layout>

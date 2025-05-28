@@ -4,3 +4,9 @@
 @plugin "daisyui" {
     themes: light --default, dark --prefersdark;
 }
+
+@layer utilities {
+    .shiki {
+        @apply max-h-96
+    }
+}

@@ -1,5 +1,7 @@
 import React, { useState, type ChangeEvent } from "react";
 import { actions } from "astro:actions";
+import JsonOutput from "./JsonOutput";
+import { useFileReader } from "./shared";
 
 interface ModelOption {
     label: string;
@@ -9,18 +11,18 @@ interface ModelOption {
 
 const MODEL_OPTIONS: ModelOption[] = [
     { label: "Invoice", action: "extractInvoice", category: "Accounts Payable" },
-    //{ label: 'Receipt',    action: 'extractReceipt',  category: 'Accounts Payable' },
-    //{ label: 'Passport',   action: 'extractKYC',      category: 'Know Your Customer' },
-    //{ label: 'ID Card',    action: 'extractKYC',      category: 'Know Your Customer' },
-    // …add more here
+    // …
 ];
 
-export default function DocumentUploader() {
+export default function Extractor() {
+    // model selection
     const [selectedAction, setSelectedAction] = useState<ModelOption>(MODEL_OPTIONS[0]);
-    const [file, setFile] = useState<File | null>(null);
-    const [base64Content, setBase64Content] = useState<string | null>("");
-    const [result, setResult] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
+
+    // file + base64 logic pulled into hook
+    const { file, base64, onFileChange } = useFileReader();
+
+    const [result, setResult] = useState<string>(JSON.stringify({ data: "will", appear: { excactly: "here" } }, null, 4));
+    const [loading, setLoading] = useState(false);
 
     // group by category for optgroups
     const grouped = MODEL_OPTIONS.reduce<Record<string, ModelOption[]>>((acc, opt) => {
@@ -33,42 +35,20 @@ export default function DocumentUploader() {
         if (opt) setSelectedAction(opt);
     };
 
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const chosen = e.target.files?.[0] ?? null;
-        if (!chosen) {
-          setFile(null);
-          setBase64Content(null);
-          return;
-        }
-
-        setFile(chosen);
-
-        const reader = new FileReader();
-        reader.readAsDataURL(chosen);
-        reader.onload = () => {
-            const dataUrl = reader.result as string;
-            const base64 = dataUrl.split(",")[1];
-            setBase64Content(base64);
-        };
-    };
-
     const handleConfirm = async () => {
-        if (!base64Content || !file) return;
+        if (!base64 || !file) return;
         setLoading(true);
         setResult("");
 
         try {
             const actionFn = (actions as any)[selectedAction.action] as Function;
             const { data, error } = await actionFn({
-                base64EncodedContent: base64Content,
+                base64EncodedContent: base64,
                 fileName: file.name,
             });
 
-            if (error) {
-                setResult(`Error: ${error.message}`);
-            } else {
-                setResult(JSON.stringify(data.fields, null, 2));
-            }
+            if (error) setResult(`Error: ${error.message}`);
+            else setResult(JSON.stringify(data.fields, null, 2));
         } catch (err: any) {
             setResult(`Error: ${err.message}`);
         }
@@ -95,15 +75,21 @@ export default function DocumentUploader() {
                 </select>
             </div>
 
-            <input type="file" accept="image/*,.pdf" className="file-input w-full file-input-primary" disabled={loading} onChange={handleFileChange} />
+            <input
+                type="file"
+                accept="image/*,.pdf"
+                className="file-input w-full file-input-primary"
+                disabled={loading}
+                onChange={onFileChange}
+            />
 
-            <button className="btn btn-primary btn-outline" onClick={handleConfirm} disabled={!base64Content || loading}>
+            <button className="btn btn-primary btn-outline" onClick={handleConfirm} disabled={!base64 || loading}>
                 {loading ? "Processing…" : "Confirm & Extract"}
             </button>
 
             <textarea
                 className="textarea textarea-bordered w-full h-64 font-mono"
-                placeholder="DocAI API output will appear here…"
+                placeholder="API output will appear here…"
                 value={result}
                 readOnly
             />
