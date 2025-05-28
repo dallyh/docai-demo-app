@@ -25,7 +25,7 @@ export const convertDocument = defineAction({
         });
 
         const docId = extractRequest.documents?.[0]?.id ?? "";
-        if (!docId) throw new ActionError({ message: "Invalid Id", code: "BAD_REQUEST" });
+        if (!docId) throw new ActionError({ message: "Invalid Id", code: "INTERNAL_SERVER_ERROR" });
 
         let response;
         while (true) {
@@ -40,7 +40,7 @@ export const convertDocument = defineAction({
         });
 
         if (!responseStream) {
-            throw new ActionError({ message: "No document stream", code: "BAD_REQUEST" });
+            throw new ActionError({ message: "No document stream", code: "INTERNAL_SERVER_ERROR" });
         }
 
         const reader = responseStream.getReader();
@@ -55,7 +55,15 @@ export const convertDocument = defineAction({
         const buffer = Buffer.concat(chunks.map((c) => Buffer.from(c)));
         const documentBase64 = buffer.toString("base64");
 
-        await documentAi.documents.delete({ documentId: docId });
+        try {
+            await documentAi.documents.delete({
+                documentId: docId,
+            });
+
+            console.log("Deleted document :" + docId);
+        } catch (err) {
+            console.log("Document delete error :" + err);
+        }
 
         return {
             document: {

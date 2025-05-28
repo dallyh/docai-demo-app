@@ -1,38 +1,110 @@
-import React, { useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { actions } from "astro:actions";
-import JsonOutput from "./JsonOutput";
 import { useFileReader } from "./shared";
+import DocumentViewer from "./DocumentViewer";
+import type { ExtractionModel } from "src/actions/types";
 
 interface ModelOption {
     label: string;
-    action: keyof typeof actions;
+    model: ExtractionModel;
     category: string;
 }
 
-const MODEL_OPTIONS: ModelOption[] = [
-    { label: "Invoice", action: "extractInvoice", category: "Accounts Payable" },
-    // …
-];
+const MODEL_LABELS: Record<ExtractionModel, string> = {
+    // Accounts Payable
+    invoice: "Invoice",
+    purchaseOrder: "Purchase Order",
+    remittanceAdvice: "Remittance Advice",
+
+    // Expenses
+    receipt: "Receipt",
+    hotelInvoice: "Hotel Invoice",
+    taxiReceipt: "Taxi Receipt",
+    utilityBill: "Utility Bill",
+
+    // Tax & HR
+    usForm1040: "US Form 1040",
+    usFormW2: "US Form W-2",
+
+    // Finance
+    personalEarningsStatement: "Personal Earnings Statement",
+    bankStatement: "Bank Statement",
+    brokerageStatement: "Brokerage Statement",
+
+    // Logistics / Shipping
+    deliveryNote: "Delivery Note",
+    airWaybill: "Air Waybill",
+    arrivalNotice: "Arrival Notice",
+    billOfLading: "Bill of Lading",
+    certificateOfOrigin: "Certificate of Origin",
+    commercialInvoice: "Commercial Invoice",
+    dangerousGoodsDeclaration: "Dangerous Goods Declaration",
+    customsDeclaration: "Customs Declaration",
+    packingList: "Packing List",
+    seaWaybill: "Sea Waybill",
+    internationalConsignmentNote: "International Consignment Note",
+
+    // Legal / Contracts
+    basicContract: "Basic Contract",
+};
+
+const MODEL_CATEGORIES: Record<ExtractionModel, string> = {
+    // Accounts Payable
+    invoice: "Accounts Payable",
+    purchaseOrder: "Accounts Payable",
+    remittanceAdvice: "Accounts Payable",
+
+    // Expenses
+    receipt: "Expenses",
+    hotelInvoice: "Expenses",
+    taxiReceipt: "Expenses",
+    utilityBill: "Expenses",
+
+    // Tax & HR
+    usForm1040: "Tax & HR",
+    usFormW2: "Tax & HR",
+
+    // Finance
+    personalEarningsStatement: "Finance",
+    bankStatement: "Finance",
+    brokerageStatement: "Finance",
+
+    // Logistics / Shipping
+    deliveryNote: "Logistics",
+    airWaybill: "Logistics",
+    arrivalNotice: "Logistics",
+    billOfLading: "Logistics",
+    certificateOfOrigin: "Logistics",
+    commercialInvoice: "Logistics",
+    dangerousGoodsDeclaration: "Logistics",
+    customsDeclaration: "Logistics",
+    packingList: "Logistics",
+    seaWaybill: "Logistics",
+    internationalConsignmentNote: "Logistics",
+
+    // Legal / Contracts
+    basicContract: "Legal",
+};
+
+const MODEL_OPTIONS: ModelOption[] = (Object.keys(MODEL_LABELS) as ExtractionModel[]).map<ModelOption>((model) => ({
+    model,
+    label: MODEL_LABELS[model],
+    category: MODEL_CATEGORIES[model],
+}));
+
+const grouped = MODEL_OPTIONS.reduce<Record<string, ModelOption[]>>((acc, opt) => {
+    (acc[opt.category] ||= []).push(opt);
+    return acc;
+}, {});
 
 export default function Extractor() {
-    // model selection
-    const [selectedAction, setSelectedAction] = useState<ModelOption>(MODEL_OPTIONS[0]);
-
-    // file + base64 logic pulled into hook
-    const { file, base64, onFileChange } = useFileReader();
-
+    const { file, base64, doc, onFileChange } = useFileReader();
     const [result, setResult] = useState<string>(JSON.stringify({ data: "will", appear: { excactly: "here" } }, null, 4));
     const [loading, setLoading] = useState(false);
-
-    // group by category for optgroups
-    const grouped = MODEL_OPTIONS.reduce<Record<string, ModelOption[]>>((acc, opt) => {
-        (acc[opt.category] ||= []).push(opt);
-        return acc;
-    }, {});
+    const [model, setModel] = useState<ExtractionModel>("invoice");
 
     const handleModelChange = (e: ChangeEvent<HTMLSelectElement>) => {
-        const opt = MODEL_OPTIONS.find((m) => m.action === e.target.value);
-        if (opt) setSelectedAction(opt);
+        setModel(e.target.value as ExtractionModel);
     };
 
     const handleConfirm = async () => {
@@ -41,10 +113,10 @@ export default function Extractor() {
         setResult("");
 
         try {
-            const actionFn = (actions as any)[selectedAction.action] as Function;
-            const { data, error } = await actionFn({
+            const { data, error } = await actions.extractDocument({
                 base64EncodedContent: base64,
                 fileName: file.name,
+                model,
             });
 
             if (error) setResult(`Error: ${error.message}`);
@@ -62,11 +134,11 @@ export default function Extractor() {
                 <label className="label">
                     <span className="label-text">Select Model</span>
                 </label>
-                <select className="select select-bordered w-full" value={selectedAction.action} onChange={handleModelChange}>
+                <select className="select select-bordered w-full" defaultValue={MODEL_OPTIONS[0].model} onChange={handleModelChange}>
                     {Object.entries(grouped).map(([cat, opts]) => (
                         <optgroup key={cat} label={cat}>
                             {opts.map((opt) => (
-                                <option key={opt.action} value={opt.action}>
+                                <option key={opt.model} value={opt.model}>
                                     {opt.label}
                                 </option>
                             ))}
@@ -83,8 +155,16 @@ export default function Extractor() {
                 onChange={onFileChange}
             />
 
+            {doc && <DocumentViewer {...doc} />}
+
             <button className="btn btn-primary btn-outline" onClick={handleConfirm} disabled={!base64 || loading}>
-                {loading ? "Processing…" : "Confirm & Extract"}
+                {loading ? (
+                    <>
+                        <span className="loading loading-spinner" /> Processing…
+                    </>
+                ) : (
+                    "Confirm & Convert"
+                )}
             </button>
 
             <textarea

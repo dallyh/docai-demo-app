@@ -2,18 +2,16 @@ import React, { useState, type ChangeEvent } from "react";
 import { actions } from "astro:actions";
 import { useFileReader } from "./shared";
 import { Languages, DocumentConversionOutputFormat } from "@abbyy-sdk/document-ai/models/components";
+import DocumentViewer from "./DocumentViewer";
 
 export default function ConvertDocument() {
-    // file + base64 logic pulled into hook
-    const { file, base64, onFileChange } = useFileReader();
+    const { file, base64, doc, onFileChange } = useFileReader();
 
-    // user-configurable options
     const [handwriting, setHandwriting] = useState(false);
     const [preserveDocumentStructure, setPreserveDocumentStructure] = useState(false);
     const [language, setLanguage] = useState<Languages>(Languages.En);
     const [format, setFormat] = useState<DocumentConversionOutputFormat>(DocumentConversionOutputFormat.Pdf);
 
-    // results + download blob info
     const [resultText, setResultText] = useState<string>("");
     const [docBase64, setDocBase64] = useState<string | null>(null);
     const [docFileName, setDocFileName] = useState<string>("");
@@ -75,41 +73,36 @@ export default function ConvertDocument() {
         a.click();
         document.body.removeChild(a);
 
-        // free memory
         URL.revokeObjectURL(url);
     };
 
     return (
         <div className="flex flex-col gap-4">
-            <fieldset className="fieldset">
-                <legend className="fieldset-legend">Handwriting</legend>
-                <select
-                    className="select"
-                    value={handwriting ? "Yes" : "No"}
-                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setHandwriting(e.target.value === "Yes")}
-                >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                </select>
-            </fieldset>
+            <fieldset className="fieldset w-full">
+                <legend className="fieldset-legend">Options</legend>
 
-            <fieldset className="fieldset">
-                <legend className="fieldset-legend">Preserve document structure</legend>
-                <select
-                    className="select"
-                    value={preserveDocumentStructure ? "Yes" : "No"}
-                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setPreserveDocumentStructure(e.target.value === "Yes")}
-                >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                </select>
-            </fieldset>
+                <label className="label">
+                    <input
+                        type="checkbox"
+                        className="toggle"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setHandwriting(e.target.checked)}
+                    />
+                    Handwriting
+                </label>
 
-            <fieldset className="fieldset">
-                <legend className="fieldset-legend">Language</legend>
+                <label className="label">
+                    <input
+                        type="checkbox"
+                        className="toggle"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setPreserveDocumentStructure(e.target.checked)}
+                    />
+                    Preserve document structure
+                </label>
+
+                <label className="label">Language</label>
                 <select
-                    className="select"
-                    value={language}
+                    className="select w-full"
+                    defaultValue={language}
                     onChange={(e: ChangeEvent<HTMLSelectElement>) => setLanguage(e.target.value as Languages)}
                 >
                     {Object.values(Languages).map((v) => (
@@ -118,13 +111,11 @@ export default function ConvertDocument() {
                         </option>
                     ))}
                 </select>
-            </fieldset>
 
-            <fieldset className="fieldset">
-                <legend className="fieldset-legend">Format</legend>
+                <label className="label">Format</label>
                 <select
-                    className="select"
-                    value={format}
+                    className="select w-full"
+                    defaultValue={format}
                     onChange={(e: ChangeEvent<HTMLSelectElement>) => setFormat(e.target.value as DocumentConversionOutputFormat)}
                 >
                     {Object.values(DocumentConversionOutputFormat).map((v) => (
@@ -143,11 +134,19 @@ export default function ConvertDocument() {
                 onChange={onFileChange}
             />
 
+            {doc && <DocumentViewer {...doc} />}
+
             <button className="btn btn-primary btn-outline" onClick={handleConfirm} disabled={!base64 || loading}>
-                {loading ? "Processing…" : "Confirm & Convert"}
+                {loading ? (
+                    <>
+                        <span className="loading loading-spinner" /> Processing…
+                    </>
+                ) : (
+                    "Confirm & Convert"
+                )}
             </button>
 
-            <button className="btn btn-secondary" onClick={handleDownload} disabled={!docBase64}>
+            <button className="btn btn-success" onClick={handleDownload} disabled={!docBase64}>
                 Download Converted File
             </button>
 

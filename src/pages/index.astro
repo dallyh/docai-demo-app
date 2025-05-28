@@ -1,26 +1,38 @@
 ---
 import ConvertDocument from "../components/react/ConvertDocument";
 import Extractor from "../components/react/Extractor";
-import ImageToText from "../components/react/ImageToText"
+import ImageToText from "../components/react/ImageToText";
 import Layout from "../layouts/Layout.astro";
+
+export const prerender = false;
+
+const search = Astro.url.searchParams.get("mode") ?? "models";
+
+function getMode() {
+    const modes = ["models", "text", "convert"];
+    return modes.includes(search) ? search : "models";
+}
 ---
 
 <Layout>
-    <div class="tabs tabs-box">
-        <input type="radio" name="my_tabs_6" class="tab" aria-label="Models" checked="checked" />
+    <h1 class="text-xl font-bold mb-0">Document AI API demo</h1>
+    <p>
+        A simple demo utilizing the <a class="link" href="https://docs.abbyy.com/introduction" target="_blank">ABBYY Document AI API</a>.
+    </p>
+    <div role="tablist" class="tabs tabs-box p-2">
+        <a role="tab" href="?mode=models" class={`tab mb-2 ${getMode() === "models" ? "tab-active" : ""}`}>Models</a>
         <div class="tab-content bg-base-100 border-base-300 p-6">
-			<Extractor client:visible />
-		</div>
+            <Extractor client:visible />
+        </div>
 
-        <input type="radio" name="my_tabs_6" class="tab" aria-label="Image to text" />
+        <a role="tab" href="?mode=text" class={`tab mb-2 ${getMode() === "text" ? "tab-active" : ""}`}>Image to text</a>
         <div class="tab-content bg-base-100 border-base-300 p-6">
-			<ImageToText client:visible />
-		</div>
+            <ImageToText client:visible />
+        </div>
 
-        <input type="radio" name="my_tabs_6" class="tab" aria-label="Convert document" />
+        <a role="tab" href="?mode=convert" class={`tab mb-2 ${getMode() === "convert" ? "tab-active" : ""}`}>Convert</a>
         <div class="tab-content bg-base-100 border-base-300 p-6">
-			<ConvertDocument client:visible />
-		</div>
+            <ConvertDocument client:visible />
+        </div>
     </div>
-    
 </Layout>

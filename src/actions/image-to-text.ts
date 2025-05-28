@@ -25,7 +25,7 @@ export const imageToText = defineAction({
         const docId = extractRequest.documents?.[0]?.id ?? "";
 
         if (docId === "") {
-            throw new ActionError({ message: "Invalid Id", code: "BAD_REQUEST" });
+            throw new ActionError({ message: "Invalid Id", code: "INTERNAL_SERVER_ERROR" });
         }
 
         let processed, response;
@@ -41,8 +41,10 @@ export const imageToText = defineAction({
             await documentAi.documents.delete({
                 documentId: docId,
             });
-        } catch {
+
             console.log("Deleted document :" + docId);
+        } catch (err) {
+            console.log("Document delete error :" + err);
         }
 
         const extracted = response?.extractedText?.text ?? {};

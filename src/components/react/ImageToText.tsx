@@ -2,12 +2,11 @@ import React, { useState, type ChangeEvent } from "react";
 import { actions } from "astro:actions";
 import { useFileReader } from "./shared";
 import { BeginImageToTextTextExtractionRequestBodyLanguages } from "@abbyy-sdk/document-ai/models/components";
+import DocumentViewer from "./DocumentViewer";
 
 export default function ImageToText() {
-    // file + base64 logic pulled into hook
-    const { file, base64, onFileChange } = useFileReader();
+    const { file, base64, doc, onFileChange } = useFileReader();
 
-    // user-configurable options
     const [handwriting, setHandwriting] = useState(false);
     const [preserveDocumentStructure, setPreserveDocumentStructure] = useState(false);
     const [language, setLanguage] = useState<BeginImageToTextTextExtractionRequestBodyLanguages>(
@@ -45,40 +44,36 @@ export default function ImageToText() {
     return (
         <div className="flex flex-col gap-4">
             <fieldset className="fieldset">
-                <legend className="fieldset-legend">Handwriting</legend>
-                <select
-                    className="select"
-                    value={handwriting ? "Yes" : "No"}
-                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setHandwriting(e.target.value === "Yes")}
-                >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                </select>
-            </fieldset>
+                <legend className="fieldset-legend">Options</legend>
 
-            <fieldset className="fieldset">
-                <legend className="fieldset-legend">Preserve document structure</legend>
-                <select
-                    className="select"
-                    value={preserveDocumentStructure ? "Yes" : "No"}
-                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setPreserveDocumentStructure(e.target.value === "Yes")}
-                >
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                </select>
-            </fieldset>
+                <label className="label">
+                    <input
+                        type="checkbox"
+                        className="toggle"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setHandwriting(e.target.checked)}
+                    />
+                    Handwriting
+                </label>
 
-            <fieldset className="fieldset">
-                <legend className="fieldset-legend">Language</legend>
+                <label className="label">
+                    <input
+                        type="checkbox"
+                        className="toggle"
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setPreserveDocumentStructure(e.target.checked)}
+                    />
+                    Preserve document structure
+                </label>
+
+                <label className="label">Language</label>
                 <select
-                    className="select"
-                    value={language}
+                    className="select w-full"
+                    defaultValue={language}
                     onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                         setLanguage(e.target.value as BeginImageToTextTextExtractionRequestBodyLanguages)
                     }
                 >
                     {Object.values(BeginImageToTextTextExtractionRequestBodyLanguages).map((v) => (
-                        <option key={v} value={v} selected={v === "en" ? true : false}>
+                        <option key={v} value={v}>
                             {v}
                         </option>
                     ))}
@@ -93,8 +88,16 @@ export default function ImageToText() {
                 onChange={onFileChange}
             />
 
+            {doc && <DocumentViewer {...doc} />}
+
             <button className="btn btn-primary btn-outline" onClick={handleConfirm} disabled={!base64 || loading}>
-                {loading ? "Processing…" : "Confirm & Extract"}
+                {loading ? (
+                    <>
+                        <span className="loading loading-spinner" /> Processing…
+                    </>
+                ) : (
+                    "Confirm & Extract"
+                )}
             </button>
 
             <textarea
