@@ -57,8 +57,6 @@ export const extractDocument = defineAction({
 		}
 
 		const data = response[model] ?? {};
-		return {
-			fields: JSON.parse(JSON.stringify(data)),
-		};
+		return JSON.parse(JSON.stringify(data));
 	},
 });

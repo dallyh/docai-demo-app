@@ -48,7 +48,6 @@ export const imageToText = defineAction({
 		}
 
 		const data = response?.extractedText ?? {};
-		const plain = JSON.parse(JSON.stringify(data));
-		return { fields: plain };
+		return JSON.parse(JSON.stringify(data));
 	},
 });
