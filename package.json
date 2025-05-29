@@ -7,24 +7,36 @@
         "build": "astro build",
         "preview": "astro preview",
         "astro": "astro",
-        "start": "node ./dist/server/entry.mjs"
+        "start": "node ./dist/server/entry.mjs",
+        "format": "pnpm run format:code && pnpm run format:imports",
+        "format:code": "prettier -w \"**/*\" --ignore-unknown --cache",
+        "format:imports": "biome check --formatter-enabled=false --linter-enabled=false --write",
+        "lint": "biome lint --diagnostic-level=warn",
+        "lint:fix": "biome lint --write",
+        "lint:fix:unsafe": "biome lint --write --unsafe"
     },
     "dependencies": {
         "@abbyy-sdk/document-ai": "^0.1.4",
         "@astrojs/node": "^9.2.2",
         "@astrojs/react": "^4.3.0",
-        "@tailwindcss/vite": "^4.1.7",
-        "@types/react": "^19.1.6",
-        "@types/react-dom": "^19.1.5",
         "astro": "^5.8.0",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
-        "tailwindcss": "^4.1.7",
-        "zod": "^3.25.32"
+        "zod": "^3.25.34"
     },
-    "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0",
     "devDependencies": {
-        "daisyui": "^5.0.38",
-        "shiki": "^3.4.2"
+        "biome": "^0.3.3",
+        "daisyui": "^5.0.40",
+        "prettier": "^3.5.3",
+        "prettier-plugin-astro": "^0.14.1",
+        "prettier-plugin-tailwindcss": "^0.6.11",
+        "tailwindcss": "^4.1.8",
+        "@tailwindcss/vite": "^4.1.8",
+        "@types/react": "^19.1.6",
+        "@types/react-dom": "^19.1.5"
+    },
+    "packageManager": "pnpm@10.11.0",
+    "engines": {
+        "node": ">=22.0.0"
     }
 }

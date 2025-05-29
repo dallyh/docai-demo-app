@@ -1,0 +1,15 @@
+# Deep directories
+**/dist
+**/node_modules
+**/.astro
+**/public
+**/.turbo
+
+# Directories
+.astro
+dist
+node_modules
+
+# Files
+pnpm-lock.yaml
+*.mdx

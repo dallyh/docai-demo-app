@@ -32,3 +32,6 @@ create-deploy-tag.sh
 build-from-env.sh
 
 README.md
+.prettierignore
+.prettierrc.mjs
+biome.jsonc

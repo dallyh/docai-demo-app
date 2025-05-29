@@ -2,11 +2,13 @@
 @plugin "daisyui";
 
 @plugin "daisyui" {
-    themes: light --default, dark --prefersdark;
+	themes:
+		light --default,
+		dark --prefersdark;
 }
 
 @layer utilities {
-    .shiki {
-        @apply max-h-96
-    }
+	.shiki {
+		@apply max-h-96;
+	}
 }

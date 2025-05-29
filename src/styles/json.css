@@ -1,0 +1,25 @@
+pre {
+	&&::before {
+		margin: 0 !important;
+	}
+}
+
+.string {
+	color: rgb(104, 255, 104);
+}
+
+.number {
+	color: rgb(255, 176, 79);
+}
+
+.boolean {
+	color: rgb(81, 81, 255);
+}
+
+.null {
+	color: rgb(255, 84, 255);
+}
+
+.key {
+	color: rgb(255, 95, 95);
+}

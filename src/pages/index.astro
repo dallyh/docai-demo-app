@@ -9,30 +9,30 @@ export const prerender = false;
 const search = Astro.url.searchParams.get("mode") ?? "models";
 
 function getMode() {
-    const modes = ["models", "text", "convert"];
-    return modes.includes(search) ? search : "models";
+	const modes = ["models", "text", "convert"];
+	return modes.includes(search) ? search : "models";
 }
 ---
 
 <Layout>
-    <h1 class="text-xl font-bold mb-0">Document AI API demo</h1>
-    <p>
-        A simple demo utilizing the <a class="link" href="https://docs.abbyy.com/introduction" target="_blank">ABBYY Document AI API</a>.
-    </p>
-    <div role="tablist" class="tabs tabs-box p-2">
-        <a role="tab" href="?mode=models" class={`tab mb-2 ${getMode() === "models" ? "tab-active" : ""}`}>Models</a>
-        <div class="tab-content bg-base-100 border-base-300 p-6">
-            <Extractor client:visible />
-        </div>
+	<h1 class="mb-0 text-xl font-bold">Document AI API demo</h1>
+	<p>
+		A simple demo utilizing the <a class="link" href="https://docs.abbyy.com/introduction" target="_blank">ABBYY Document AI API</a>.
+	</p>
+	<div role="tablist" class="tabs tabs-box p-2">
+		<a role="tab" href="?mode=models" class={`tab mb-2 ${getMode() === "models" ? "tab-active" : ""}`}>Models</a>
+		<div class="tab-content bg-base-100 border-base-300 rounded-md p-4">
+			<Extractor client:visible />
+		</div>
 
-        <a role="tab" href="?mode=text" class={`tab mb-2 ${getMode() === "text" ? "tab-active" : ""}`}>Image to text</a>
-        <div class="tab-content bg-base-100 border-base-300 p-6">
-            <ImageToText client:visible />
-        </div>
+		<a role="tab" href="?mode=text" class={`tab mb-2 ${getMode() === "text" ? "tab-active" : ""}`}>Image to text</a>
+		<div class="tab-content bg-base-100 border-base-300 rounded-md p-4">
+			<ImageToText client:visible />
+		</div>
 
-        <a role="tab" href="?mode=convert" class={`tab mb-2 ${getMode() === "convert" ? "tab-active" : ""}`}>Convert</a>
-        <div class="tab-content bg-base-100 border-base-300 p-6">
-            <ConvertDocument client:visible />
-        </div>
-    </div>
+		<a role="tab" href="?mode=convert" class={`tab mb-2 ${getMode() === "convert" ? "tab-active" : ""}`}>Convert</a>
+		<div class="tab-content bg-base-100 border-base-300 rounded-md p-4">
+			<ConvertDocument client:visible />
+		</div>
+	</div>
 </Layout>
